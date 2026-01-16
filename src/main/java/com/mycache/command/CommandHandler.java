@@ -13,12 +13,18 @@ public class CommandHandler {
 		String command = parts[0].toUpperCase();
 		switch(command) {
 			case "SET": {
-				if(parts.length < 3) {
-					return "ERROR: Usage SET key value";
+				if(parts.length != 3 && parts.length != 4) {
+					return "ERROR: Usage SET key value [time(s)]";
 				}
 				String key = parts[1];
 				String value = parts[2];
-				store.set(key, value);
+
+				if(parts.length == 3) {
+					store.set(key, value);
+				}
+				else {
+					store.set(key, value, 1000 * Integer.valueOf(parts[3]));
+				}
 				return "OK";
 			}
 

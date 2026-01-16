@@ -7,21 +7,57 @@ import java.util.concurrent.*;
 * This class represents the core data structures we will use to store data 
 */
 public class InMemoryStore {
-	private final Map<String, String> store = new ConcurrentHashMap<>();
+	private final Map<String, Data> store = new ConcurrentHashMap<>();
 	
 	public String get(String key) {
-		return store.get(key);
+		if(!store.containsKey(key)) {
+			return null;
+		}
+		if(!isCacheEntryValid(key)) {
+			store.remove(key);
+			return null;
+		}
+		Data data = store.get(key);
+		
+		return data.getData();
 	}
 
 	public void set(String key, String value) {
-		store.put(key, value);
+		Data data = new Data(key, value);
+		store.put(key, data);
+	}
+	
+	public void set(String key, String value, long ttl) {
+		Data data = new Data(key, value, ttl);
+		store.put(key, data);
 	}
 
 	public int size() {
+		invalidateCache();
 		return store.size();
 	}
 
 	public String delete(String key) {
-		return store.remove(key);
+		return store.remove(key).getData();
 	}
+
+	private void invalidateCache() {
+		Set<String> expiredKeys = new HashSet<>();
+		for(Map.Entry<String, Data> entry: store.entrySet()) {
+			String key = entry.getKey();
+			if(!isCacheEntryValid(key)) {
+				expiredKeys.add(key);
+			}
+		}
+		store.keySet().removeAll(expiredKeys);
+	}
+
+	private boolean isCacheEntryValid(String key) {
+		Data data = store.get(key);
+		if(data.getExpirationTime() != -1 && data.getExpirationTime() < System.currentTimeMillis()) {	
+			return false;
+		}
+		return true;
+	}
+
 }
