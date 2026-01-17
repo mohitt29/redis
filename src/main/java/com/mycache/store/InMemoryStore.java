@@ -41,6 +41,10 @@ public class InMemoryStore {
 		return store.remove(key).getData();
 	}
 
+	public Map<String, Data> getSnapshot() {
+		return new HashMap<>(store);
+	}
+
 	private void invalidateCache() {
 		Set<String> expiredKeys = new HashSet<>();
 		for(Map.Entry<String, Data> entry: store.entrySet()) {
@@ -61,3 +65,4 @@ public class InMemoryStore {
 	}
 
 }
+

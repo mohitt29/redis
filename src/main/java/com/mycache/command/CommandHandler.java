@@ -7,6 +7,9 @@ import com.mycache.store.*;
 * This class is used for handling different commands
 */
 public class CommandHandler {
+	
+	private static final int PAGE_LIMIT = 5;
+	
 	public static String handleCommand(String input, InMemoryStore store) {
 		String[] parts = input.trim().split(" ");
 
@@ -50,6 +53,24 @@ public class CommandHandler {
 				}
 				store.delete(key);
 				return String.format("OK: Removed %s", key);
+			}
+
+			case "SCAN": {
+				if(parts.length != 2 || !parts[1].matches("^\\d+$")) {
+					return "ERROR: Usage SCAN [number]";
+				}
+				List<Map.Entry<String, Data>> dataList = new ArrayList<>(store.getSnapshot().entrySet());
+
+				int start = Integer.parseInt(parts[1]);
+				int end = Math.min(start + PAGE_LIMIT, dataList.size());
+
+
+				StringBuilder answer = new StringBuilder();
+				answer.append("NEXT " + end + "\n");
+				for(int i = start; i < end; i++) {
+					answer.append(dataList.get(i).getKey() + "=" + dataList.get(i).getValue() + "\n");
+				}
+				return answer.toString();
 			}
 
 			default: {
