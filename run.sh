@@ -4,4 +4,4 @@ echo "Compiling..."
 javac -d out $(find src -name "*.java")
 
 echo "Starting server..."
-java -cp out com.mycache.server.CacheServer
+java -cp out com.mycache.server.CacheServer $1

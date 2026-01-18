@@ -2,6 +2,7 @@ package com.mycache.command;
 
 import java.util.*;
 import com.mycache.store.*;
+import com.mycache.persistence.*;
 
 /**
 * This class is used for handling different commands
@@ -9,8 +10,9 @@ import com.mycache.store.*;
 public class CommandHandler {
 	
 	private static final int PAGE_LIMIT = 5;
+	private static LogWriter logWriter = new LogWriter();
 	
-	public static String handleCommand(String input, InMemoryStore store) {
+	public static String handleCommand(String input, InMemoryStore store, boolean isLogNeeded) {
 		String[] parts = input.trim().split(" ");
 
 		String command = parts[0].toUpperCase();
@@ -21,7 +23,10 @@ public class CommandHandler {
 				}
 				String key = parts[1];
 				String value = parts[2];
-
+				
+				if(isLogNeeded) {
+					logWriter.append(input.trim());
+				}
 				if(parts.length == 3) {
 					store.set(key, value);
 				}
@@ -46,6 +51,9 @@ public class CommandHandler {
 			case "DEL": {
 				if(parts.length < 2) {
 					return "ERROR: Usage DEL key";
+				}
+				if(isLogNeeded) {
+					logWriter.append(input.trim());
 				}
 				String key = parts[1];
 				if(store.get(key) == "NULL") {
