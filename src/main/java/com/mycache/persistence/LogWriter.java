@@ -9,10 +9,6 @@ import java.io.*;
 public class LogWriter {
 	private static final String LOG_FILE_PATH = "data/data.log";
 
-	public void clear() {
-		
-	}
-
 	public void append(String command) {
 		try(BufferedWriter bw = new BufferedWriter(new FileWriter(LOG_FILE_PATH, true))) {
 			bw.write(command);

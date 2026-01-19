@@ -23,10 +23,10 @@ public class LogReader {
 			return;	
 		}
 
+		System.out.println("Creating cache from data/data.log file");
 		try(BufferedReader br = new BufferedReader(new FileReader(file))) {
 			String line = null;
 			while((line = br.readLine()) != null) {
-				System.out.println(line);
 				CommandHandler.handleCommand(line, store, false);
 			}
 		}
