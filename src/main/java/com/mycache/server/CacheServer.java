@@ -3,6 +3,7 @@ package com.mycache.server;
 import java.util.*;
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.*;
 import com.mycache.store.*;
 import com.mycache.command.*;
 import com.mycache.persistence.*;
@@ -14,6 +15,7 @@ public class CacheServer {
 	private static final int PORT = 6379;
 	private static final InMemoryStore cache = new InMemoryStore();
 	private static final LogReader logReader = new LogReader(cache);
+	private static ExecutorService pool = Executors.newFixedThreadPool(10);
 
 	public static void main(String[] args) throws Exception {
 		if(args.length > 0 && "--restore".equals(args[0])) {
@@ -25,7 +27,7 @@ public class CacheServer {
 
 		while(true) {
 			Socket client = server.accept();
-			new Thread(() -> handleClient(client)).start();
+			pool.submit(() -> handleClient(client));
 		}
 	}
 

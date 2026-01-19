@@ -7,6 +7,11 @@ import java.util.concurrent.*;
 * This class represents the core data structures we will use to store data 
 */
 public class InMemoryStore {
+
+	public InMemoryStore() {
+		startCacheCleanerThread();
+	}
+
 	private final Map<String, Data> store = new ConcurrentHashMap<>();
 	
 	public String get(String key) {
@@ -43,6 +48,20 @@ public class InMemoryStore {
 
 	public Map<String, Data> getSnapshot() {
 		return new HashMap<>(store);
+	}
+
+	private void startCacheCleanerThread() {
+		new Thread(() -> {
+			try {
+				while(true) {
+					invalidateCache();
+					Thread.sleep(5000);
+				}
+			}
+			catch(Exception e) {
+				System.out.println("Exception occurred while cleaning cache");
+			}
+		}).start();
 	}
 
 	private void invalidateCache() {
